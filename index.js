@@ -1,4 +1,5 @@
 var express = require ('express');
+var bodyParser = require ('body-parser');
 // var http = require ('http');
 var mime = require('mime-types');
 var fs = require('fs');
@@ -10,43 +11,42 @@ var mimeTypes = {
   '.png': 'image/png'
   //'.jepg': 'image/jepg'
 }
-
 var data = [
   {
-    id: 'evil-dead',
-    title: 'Evil Dead',
-    plot: 'Five friends travel to a cabin in the …',
-    description: 'Five friends head to a remote …'
+    id: '1',
+    name: 'Finn',
+    fur: 'Brown-gray',
+    description: 'Bengal'
   },
   {
-    id: 'the-shawshank-redemption',
-    title: 'The Shawshank Redemption',
-    plot: 'Two imprisoned men bond over a number …',
-    description: 'Andy Dufresne is a young and  …'
+    id: '2',
+    name: 'Mojo',
+    fur: 'Red',
+    description: 'Maincoon'
   }
 ]
 
-express()
-  .get('/', movies)
-  .get('/:id', movie)
-  .use(notFound)
+var app = express();
+
+//GET
+  app.get('/', movies);
+  app.get('/:id', movie);
+
+//USE
+  app.use(express.static('static'));
+  app.use(notFound);
   // https://stackoverflow.com/questions/24582338/how-can-i-include-css-files-using-node-express-and-ejs
-  .use(express.static(__dirname + 'static'))
-  .listen(8000);
+  app.use(express.static(__dirname + 'static'));
 
-  function notFound (request, response) {
-    var doc = '<!doctype html>'
+// SET
+  app.set('view engine', 'ejs');
+  app.set('views', 'view');
 
-    doc += '<link rel="stylesheet" href="/style.css"/>'
-    doc += '<title>Not found - My movie website</title>';
-    doc += '<h1>Not found</h1>';
-    doc += "<p>Uh oh! We couldn't find this page!</p>";
-
-    response.status(404).send(doc);
-  }
+  app.listen(8000);
 
   function movies (request, response) {
-    var doc = '<!doctype html>';
+    res.render('list_animals.ejs', {data: data})
+    /*var doc = '<!doctype html>';
     var length = data.length
     var index = -1
     var movie
@@ -58,32 +58,45 @@ express()
     while(++index < length) {
       movie = data[index];
       doc += '<h2><a href="/' + movie.id + '">' + movie.title + '</a></h2>'
-      doc += '<p>' +  movie.plot + '</p>';
+      doc += '<p>' +  movie.plot + '</p>';*/
     }
 
     response.send(doc);
   }
 
   function movie(request, response, next) {
-    var id = request.params.id;
+    res.render('detail.ejs', {data: movie})
+    /*var id = request.params.id;
     var doc = '<!doctype html>';
 
-    doc += '<link rel="stylesheet" href="/style.css"/>'
     var movie = find(data, function (value){
-      return value.id === id;
+      return value.id === id;*/
     })
 
     if (!movie) {
       next();
       return;
     }
-
+    /*
     doc += '<title>' + movie.title + ' - My movie website</title>';
     doc += '<h1>' + movie.title + '<h1>';
-    doc += '<p>' + movie.description + '</p>';
+    doc += '<p>' + movie.description + '</p>';*/
 
     response.send(doc);
   }
+
+  function notFound (request, response) {
+    response.status(404).render('404.ejs');
+    /*var doc = '<!doctype html>'
+
+    doc += '<link rel="stylesheet" href="/style.css"/>'
+    doc += '<title>Not found - My movie website</title>';
+    doc += '<h1>Not found</h1>';
+    doc += "<p>Uh oh! We couldn't find this page!</p>";
+
+    response.status(404).send(doc);/*
+  }
+
 
 /*var routes = {
   '/about': 'This is my website\n',
